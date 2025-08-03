@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>20 Days Strong</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #111;
+      color: #fff;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: url('assets/images/download.jpg') center/cover no-repeat;
+      opacity: 0.15;
+      z-index: 0;
+      pointer-events: none;
+      animation: sparkle 20s linear infinite;
+    }
+
+    @keyframes sparkle {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 100% 100%; }
+    }
+
+    .intro-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #0f0f0f, #1c1c1c);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      text-align: center;
+      padding: 20px;
+    }
+    .intro-message {
+      font-size: 1.8rem;
+      margin-bottom: 30px;
+      max-width: 90%;
+    }
+    .start-button {
+      background: #fff;
+      color: #111;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+      z-index: 1;
+    }
+    .start-button:hover {
+      background: #ccc;
+    }
+    .slideshow {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      padding: 40px;
+      box-sizing: border-box;
+    }
+    .slide.active {
+      opacity: 1;
+    }
+    .caption {
+      background: rgba(0,0,0,0.6);
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 90%;
+      text-align: center;
+      font-size: 1.2rem;
+      line-height: 1.5;
+      z-index: 2;
+    }
+    .controls {
+      position: fixed;
+      bottom: 20px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 100;
+    }
+    .controls button {
+      background: rgba(0,0,0,0.5);
+      border: none;
+      color: white;
+      padding: 12px 18px;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: background 0.3s ease;
+    }
+    .controls button:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    audio {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      width: 90%;
+      max-width: 400px;
+    }
+    @media (max-width: 600px) {
+      .caption {
+        font-size: 1rem;
+        padding: 15px;
+      }
+      .controls button {
+        font-size: 0.9rem;
+        padding: 10px 15px;
+      }
+      .intro-message {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="intro-screen" id="intro">
+    <div class="intro-message">
+      This journey is a tribute to your strength, resilience, and the 20 days you faced with courage and heart. 💪<br /><br />
+      Click below when you're ready to relive this inspiring chapter.
+    </div>
+    <button class="start-button" onclick="startJourney()">Start Journey</button>
+  </div>
+
+  <audio id="bg-music" loop>
+    <source src="assets/audio/your-music.mp3" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
+
+  <div class="slideshow" id="slideshow" style="display:none;"></div>
+  <div class="controls" id="controls" style="display:none;">
+    <button onclick="prevSlide()">⟨ Previous</button>
+    <button onclick="nextSlide()">Next ⟩</button>
+  </div>
+
+  <script>
+    const images = [
+      "assets/images/day1.jpeg", "assets/images/day2.jpeg", "assets/images/day3.jpeg",
+      "assets/images/day4.jpeg", "assets/images/day5.jpeg", "assets/images/day6.jpeg",
+      "assets/images/day7.jpeg", "assets/images/day8.jpeg", "assets/images/day9.jpeg",
+      "assets/images/day10.jpeg", "assets/images/day11.jpeg", "assets/images/day12.jpeg",
+      "assets/images/day13.jpeg", "assets/images/day14.jpeg", "assets/images/day15.jpeg",
+      "assets/images/day16.jpeg", "assets/images/day17.jpeg", "assets/images/day18.jpeg",
+      "assets/images/day19.jpeg", "assets/images/day20.jpeg"
+    ];
+
+    const messages = [
+      "Day 1: The pain begins, but you're stronger than it.",
+      "Day 2: Hospital visits don't scare gym warriors.",
+      "Day 3: You flexed your courage today.",
+      "Day 4: No barbell, no problem — you're still lifting spirits.",
+      "Day 5: Pain today, power tomorrow.",
+      "Day 6: This hand rests, but your heart trains.",
+      "Day 7: One week in. Still standing strong.",
+      "Day 8: Your will is unbreakable.",
+      "Day 9: Even the weights miss you.",
+      "Day 10: Halfway through, look how far you've come.",
+      "Day 11: Biceps on pause, but strength never paused.",
+      "Day 12: You’re the definition of resilience.",
+      "Day 13: Gym soul, fighter body.",
+      "Day 14: Power isn’t in muscles, it’s in spirit.",
+      "Day 15: You're healing like a champion.",
+      "Day 16: Bravery is your best workout.",
+      "Day 17: Soon the iron will call again.",
+      "Day 18: You’re not just recovering — you're evolving.",
+      "Day 19: Almost there, almost unstoppable.",
+      "Day 20: You did it, champ. Time to lift again."
+    ];
+
+    const slideshow = document.getElementById('slideshow');
+
+    images.forEach((img, index) => {
+      const slide = document.createElement('div');
+      slide.className = 'slide';
+      slide.style.backgroundImage = `url(${img})`;
+      const caption = document.createElement('div');
+      caption.className = 'caption';
+      caption.textContent = messages[index];
+      slide.appendChild(caption);
+      slideshow.appendChild(slide);
+    });
+
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+
+    function showSlide(index) {
+      slides.forEach(s => s.classList.remove('active'));
+      slides[index].classList.add('active');
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % slides.length;
+      showSlide(currentSlide);
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        showSlide(currentSlide);
+      }
+    }
+
+    let slideshowInterval;
+
+    function startJourney() {
+      document.getElementById('intro').style.display = 'none';
+      document.getElementById('slideshow').style.display = 'block';
+      document.getElementById('controls').style.display = 'flex';
+      const audio = document.getElementById('bg-music');
+      audio.play().catch(err => console.log("Autoplay blocked:", err));
+      showSlide(currentSlide);
+      slideshowInterval = setInterval(() => {
+        nextSlide();
+      }, 12000);
+    }
+  </script>
+</body>
+</html>
